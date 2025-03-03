@@ -100,33 +100,6 @@ const commands = [
     .setDescription('View server-wide progression through PoP content')
 ];
 
-
-// Add this to your Supabase initialization code to track database status
-const testDatabaseConnection = async () => {
-  try {
-    // Simple query to test database connection
-    const { data, error } = await supabase.from('player_data').select('count(*)', { count: 'exact' }).limit(1);
-    return !error;
-  } catch (e) {
-    console.error('Database connection test failed:', e);
-    return false;
-  }
-};
-
-// Update database status periodically
-const updateDatabaseStatus = async () => {
-  const connected = await testDatabaseConnection();
-  healthcheck.updateStatus({
-    ...global.healthStatus,
-    databaseConnected: connected
-  });
-};
-
-// Call this on startup and periodically
-updateDatabaseStatus();
-setInterval(updateDatabaseStatus, 60000); // Check every minute
-
-
 // Deploy slash commands when the bot starts
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user.tag}`);
