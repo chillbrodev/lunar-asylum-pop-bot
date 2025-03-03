@@ -16,6 +16,7 @@ const CMD_RESET_FLAGS = 'pop-resetflags';
 const CMD_PROGRESS = 'pop-progress';
 const CMD_NEXT_STEPS = 'pop-nextsteps';
 const CMD_GUILD_PROGRESS = 'pop-guildprogress';
+const CMD_HELP = 'pop-help';
 
 // Initialize client with necessary intents
 const client = new Client({
@@ -95,7 +96,11 @@ const commands = [
         
   new SlashCommandBuilder()
     .setName(CMD_GUILD_PROGRESS)
-    .setDescription('View server-wide progression through PoP content')
+    .setDescription('View server-wide progression through PoP content'),
+
+  new SlashCommandBuilder()
+    .setName(CMD_HELP)
+    .setDescription('View commands for this bot.')
 ];
 
 // Deploy slash commands when the bot starts
@@ -326,6 +331,18 @@ client.on('interactionCreate', async interaction => {
       progressEmbed.addFields({ name: 'Top Players', value: playerList || 'No data available', inline: false });
       
       await interaction.editReply({ embeds: [progressEmbed] });
+      break;
+    }
+
+    case CMD_HELP: {
+      await interaction.reply(`
+* /pop-help - Shows the following commands
+* /pop-trackflag flag:[flag name] player:[optional] - Mark a flag as completed for you or another player.
+* /pop-resetflags - Reset all your PoP flags (only works on yourself).
+* /pop-progress player:[optional] - View your or another player's progress through PoP.
+* /pop-nextsteps player:[optional] - See what flags are available to complete next.
+* /pop-guildprogress - See the progess percentage of each guild player.
+      `);
       break;
     }
   }
