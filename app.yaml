@@ -1,0 +1,45 @@
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+envs:
+- key: DISCORD_TOKEN
+  scope: RUN_TIME
+  type: SECRET
+  value: EV[1:pfbZpmXLCOUSw7CuOS+eaG5JiuBY++Rt:sV/sOupym3tqw0EO+3m2AZkePcw+YYOKZgQlnEdGMWUMvKZ5CduGJhzHJIXX7pTM1xBo8A4NdQJN553OJHmbTx9bJMKEZXonj6Kr9ZT/RjJC5hR7ws//Fw==]
+- key: SUPABASE_URL
+  scope: RUN_TIME
+  value: https://ejuitenrkctjnwfrlojq.supabase.co
+- key: SUPABASE_KEY
+  scope: RUN_TIME
+  type: SECRET
+  value: EV[1:wReQfZY8DtdLSDkt4tnJIS/7P5qefAlr:bq7LCeYxYAXG+4DyvPUaQ1HMYKXaibaqoOsIDBR/8wOEginULSFzByOk4BLEje0gnz3W5oP5LzcNB/Rbbj3p35eEJPq/Z55rT1pYkgMZSDLyUJIvaQbfNekNCm5wNG9sGMSOBEXE1IuY+xf7OthQMXyIquoMnzTBJE30sOAzonyPHgxBiyF2a8K71ZTp7ZZBFW2ED6adImMNQOGIrs61HdR52imQDZtb1TNjHn+kZStPWwp/ErwnnAfMgX6IbkJ1EVTcUQG7bb2wPh+zU/rsWAmlTsD+86WOkgE9isbQFNYu/T15bqClH4z9/Q==]
+features:
+- buildpack-stack=ubuntu-22
+ingress:
+  rules:
+  - component:
+      name: lunar-asylum-pop-bot
+    match:
+      path:
+        prefix: /
+name: lunar-asylum-pop-tracker
+region: sfo
+services:
+- dockerfile_path: /Dockerfile
+  github:
+    branch: deploy
+    deploy_on_push: true
+    repo: chillbrodev/lunar-asylum-pop-bot
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  name: lunar-asylum-pop-bot
+  source_dir: /
+  health_check:
+    initial_delay_seconds: 30
+    period_seconds: 10
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 5
+    http_path: /health
+    port: 8080

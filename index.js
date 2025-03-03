@@ -2,6 +2,15 @@
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 require('dotenv').config();
 const SupabaseDB = require('./supabase-db'); // Import the Supabase module
+// Add this near the top of your main bot file
+const healthcheck = require('./healthcheck');
+
+// Initialize health status
+healthcheck.updateStatus({
+  ready: false,
+  lastPing: null,
+  databaseConnected: false
+});
 
 // Define command enum to avoid magic strings
 const CMD_TRACK_FLAG = 'pop-trackflag';
@@ -91,9 +100,42 @@ const commands = [
     .setDescription('View server-wide progression through PoP content')
 ];
 
+
+// Add this to your Supabase initialization code to track database status
+const testDatabaseConnection = async () => {
+  try {
+    // Simple query to test database connection
+    const { data, error } = await supabase.from('player_data').select('count(*)', { count: 'exact' }).limit(1);
+    return !error;
+  } catch (e) {
+    console.error('Database connection test failed:', e);
+    return false;
+  }
+};
+
+// Update database status periodically
+const updateDatabaseStatus = async () => {
+  const connected = await testDatabaseConnection();
+  healthcheck.updateStatus({
+    ...global.healthStatus,
+    databaseConnected: connected
+  });
+};
+
+// Call this on startup and periodically
+updateDatabaseStatus();
+setInterval(updateDatabaseStatus, 60000); // Check every minute
+
+
 // Deploy slash commands when the bot starts
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user.tag}`);
+
+  healthcheck.updateStatus({
+    ready: true,
+    lastPing: new Date().toISOString(),
+    databaseConnected: global.healthStatus?.databaseConnected || false
+  });
   
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
   
@@ -319,7 +361,13 @@ client.on('interactionCreate', async interaction => {
 });
 
 // Error handling
-client.on('error', console.error);
+client.on('error', (error) => {
+  console.error('Discord client error:', error);
+  healthcheck.updateStatus({
+    ...global.healthStatus,
+    ready: false
+  });
+});
 
 // Login to Discord
 client.login(process.env.DISCORD_TOKEN);
