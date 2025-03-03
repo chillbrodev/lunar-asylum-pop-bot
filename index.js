@@ -1,8 +1,6 @@
-// Updated version of the EverQuest PoP Tracker Bot with Supabase integration
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 require('dotenv').config();
-const SupabaseDB = require('./supabase-db'); // Import the Supabase module
-// Add this near the top of your main bot file
+const SupabaseDB = require('./supabase-db');
 const healthcheck = require('./healthcheck');
 
 // Initialize health status

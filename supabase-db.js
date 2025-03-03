@@ -1,3 +1,4 @@
+const healthcheck = require('./healthcheck');
 // Supabase database integration for EverQuest PoP Tracker Bot
 const { createClient } = require('@supabase/supabase-js');
 
@@ -6,6 +7,11 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+healthcheck.updateStatus({
+    ...global.healthStatus,
+    databaseConnected: true
+});
+  
 // Table schema to set up in Supabase:
 /*
 Table: player_flags
