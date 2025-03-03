@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  eq-pop-bot:
+    build: .
+    container_name: eq-pop-tracker
+    restart: unless-stopped
+    env_file: .env
+    environment:
+    - SUPABASE_URL=${SUPABASE_URL}
+    - SUPABASE_KEY=${SUPABASE_KEY}
